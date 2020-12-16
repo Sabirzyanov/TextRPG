@@ -2,12 +2,12 @@ import random
 
 
 class Player:
-    def __init__(self):
-        self.hp = 100
-        self.power = 1
-        self.defense = 1
-        self.coins = 0
-        self.items = []
+    def __init__(self, hp, power, defense, coins, items):
+        self.hp = hp
+        self.power = power
+        self.defense = defense
+        self.coins = coins
+        self.items = items
 
 
 class Items:
@@ -57,9 +57,8 @@ class ChestRoom(Room):
 def main():
     print("Вы хотите спуститься в подземелье?")
     running = True if int(input("1 - Да, 2 - Нет: ")) == 1 else False
+    player = Player(100, 1, 1, 0, [])
     while running:
-        player = Player()
-        print("Вы спустились в подземелье, действия: ")
         command = int(input("1 - Посмотреть информацию о персонаже, 2 - Пройти дальше\n"
                             "3 - Посмотреть Инвентарь, 4 - Покинуть подземелье: "))
         if command == 1:
@@ -69,9 +68,9 @@ def main():
         elif command == 2:
             enemy_count = random.randint(2, 4)
             room_random = random.random()
-            if room_random > 0.3:
+            if room_random > 0.9:
                 room = Room("Fight", enemy_count)
-                print("Вы зашли в комнату. Ваши действия: ")
+                print("Вы зашли в комнату с врагами. Ваши действия: ")
                 command = int(input("1 - Убежать(Возмодность потерять ХП), 2 - Атаковать врага, "
                                     "3 - Посмотреть информацияю о врагах: "))
                 if command == 1:
@@ -87,14 +86,23 @@ def main():
                 print("Вы нашли сундук. Открыть его?")
                 command = int(input("1 - Да, открыть, 2 - Нет, уйти: " ))
                 if command == 1:
-                    pass
+                    reward_key = random.choice(list(room.reward_item().keys()))
+                    reward = random.choice(room.reward_item()[reward_key])
+                    print(reward.name if reward_key == "Melee" else reward)
+                    if reward_key == "Coins":
+                        print(f"Вам выпало {reward} монет.")
+                        player.coins += reward
+                    else:
+                        print(f'Вам выпал {reward.name}.')
+                        player.items.append(reward)
                 else:
                     continue
             if room.types == "Fight":
                 print(room.enemy_count)
         elif command == 3:
             if len(player.items) != 0:
-                pass
+                for i in player.items:
+                    print(i.name)
             else:
                 print("В вашем инвентаре ничего пока нет:(\n")
         elif command == 4:
